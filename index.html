@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!-- Portfolio web personal de Paolo Landó -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- viewport: necesario para que el sitio sea responsive en celulares -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio de Paolo Landó, estudiante de programación orientado al desarrollo backend con Java y Spring Boot.">
+  <title>Paolo Landó | Portfolio</title>
+
+  <!-- Hoja de estilos externa -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===================== ENCABEZADO Y NAVEGACIÓN ===================== -->
+  <header class="encabezado">
+    <div class="encabezado__contenido">
+      <a href="#inicio" class="logo">PL<span>.</span></a>
+
+      <!-- Botón de menú: solo se ve en pantallas chicas (ver media query en el CSS) -->
+      <button id="boton-menu" class="boton-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
+
+      <nav id="menu" class="menu" aria-label="Navegación principal">
+        <ul class="menu__lista">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#sobre-mi">Sobre mí</a></li>
+          <li><a href="#proyectos">Proyectos</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+
+      <!-- Botón para cambiar entre modo oscuro y claro -->
+      <button id="boton-tema" class="boton-tema" type="button" aria-label="Cambiar entre modo oscuro y claro">☀️</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== INICIO ===================== -->
+    <section id="inicio" class="inicio">
+      <div class="inicio__texto">
+        <p class="inicio__saludo">Hola, soy</p>
+        <h1>Paolo Landó</h1>
+        <p class="inicio__rol">Estudiante de Programación · Desarrollo Backend</p>
+        <p>
+          Estoy estudiando programación y me interesa el desarrollo backend de software.
+          Trabajo con Java y Spring Boot, y busco mi primera oportunidad en IT como Trainee o Junior.
+        </p>
+        <!-- Llamada a la acción: lleva a la sección Proyectos -->
+        <div class="inicio__botones">
+          <a href="#proyectos" class="boton boton--principal">Ver mis proyectos</a>
+          <a href="#contacto" class="boton boton--secundario">Contactame</a>
+        </div>
+      </div>
+
+      <figure class="inicio__imagen">
+        <img src="img/foto-paolo.jpg" alt="Foto de Paolo Landó" width="350" height="350">
+      </figure>
+    </section>
+
+    <!-- ===================== SOBRE MÍ ===================== -->
+    <section id="sobre-mi" class="seccion">
+      <h2>Sobre mí</h2>
+
+      <!-- Estas tarjetas se acomodan con CSS Grid -->
+      <div class="sobre-mi__grilla">
+
+        <article class="tarjeta">
+          <h3>Presentación</h3>
+          <p>
+            Soy estudiante de programación y mi objetivo es dedicarme al backend.
+            Refactoricé una aplicación de escritorio en Java a un microservicio REST,
+            y hoy sigo aprendiendo desarrollo web para completar mi perfil.
+          </p>
+          <p>Vivo en Posadas, Misiones, Argentina.</p>
+        </article>
+
+        <article class="tarjeta">
+          <h3>Formación</h3>
+          <ul class="lista">
+            <li>
+              <strong>Tecnicatura Superior en Gestión en Programación e Innovación Tecnológica</strong><br>
+              INCADE · 2º año en curso
+            </li>
+            <li>
+              <strong>Ingeniería en Sistemas de Información</strong><br>
+              Universidad Cuenca del Plata · 2020 - 2024 (2º año completo)
+            </li>
+            <li>
+              <strong>Curso de Introducción a la Programación</strong><br>
+              Silicon Misiones
+            </li>
+          </ul>
+        </article>
+
+        <article class="tarjeta">
+          <h3>Idiomas</h3>
+          <ul class="lista">
+            <li><strong>Español:</strong> nativo</li>
+            <li><strong>Inglés:</strong> intermedio (buena comprensión lectora y técnica, conversación básica)</li>
+          </ul>
+        </article>
+      </div>
+
+      <!-- Habilidades: se muestran como "etiquetas" con Flexbox -->
+      <h3 class="subtitulo">Tecnologías y habilidades</h3>
+
+      <div class="habilidades">
+        <div class="habilidades__grupo">
+          <h4>Las uso en mis proyectos</h4>
+          <ul class="etiquetas">
+            <li>Java 17</li>
+            <li>Spring Boot</li>
+            <li>Maven</li>
+            <li>REST APIs</li>
+            <li>Spring Data JPA</li>
+            <li>H2</li>
+            <li>JUnit 5</li>
+            <li>Mockito</li>
+            <li>Docker</li>
+            <li>Git</li>
+            <li>GitHub</li>
+          </ul>
+        </div>
+
+        <div class="habilidades__grupo">
+          <h4>Estoy aprendiendo</h4>
+          <ul class="etiquetas etiquetas--aprendiendo">
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>JavaScript</li>
+            <li>React</li>
+            <li>TypeScript</li>
+          </ul>
+        </div>
+
+        <div class="habilidades__grupo">
+          <h4>Conceptos clave</h4>
+          <ul class="etiquetas">
+            <li>Programación Orientada a Objetos</li>
+            <li>Arquitectura en capas</li>
+            <li>Estructuras de datos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PROYECTOS ===================== -->
+    <section id="proyectos" class="seccion">
+      <h2>Proyectos</h2>
+
+      <!-- Campo de búsqueda: filtra las tarjetas mientras se escribe (evento input) -->
+      <div class="buscador">
+        <label for="buscador-proyectos">Buscar proyecto o tecnología</label>
+        <input type="search" id="buscador-proyectos" placeholder="Ej: Java, React, Docker...">
+      </div>
+
+      <!-- Las tarjetas las crea JavaScript a partir del arreglo "proyectos" (js/script.js) -->
+      <div id="lista-proyectos" class="proyectos__grilla"></div>
+
+      <p id="sin-resultados" class="mensaje-vacio" hidden>No encontré ningún proyecto con esa búsqueda.</p>
+    </section>
+
+    <!-- ===================== CONTACTO ===================== -->
+    <section id="contacto" class="seccion">
+      <h2>Contacto</h2>
+
+      <div class="contacto__contenido">
+
+        <aside class="contacto__datos">
+          <h3>Hablemos</h3>
+          <p>Si querés comunicarte conmigo, escribime por el formulario o por alguno de estos medios:</p>
+          <ul class="lista lista--enlaces">
+            <li>Email: <a href="mailto:landopaolo035@gmail.com">landopaolo035@gmail.com</a></li>
+            <li>GitHub: <a href="https://github.com/PaoloLando" target="_blank" rel="noopener noreferrer">github.com/PaoloLando</a></li>
+            <li>LinkedIn: <a href="https://www.linkedin.com/in/paolo-land%C3%B3" target="_blank" rel="noopener noreferrer">linkedin.com/in/paolo-landó</a></li>
+          </ul>
+        </aside>
+
+        <!-- novalidate: desactivo la validación del navegador para validar con JavaScript -->
+        <form id="formulario" class="formulario" novalidate>
+          <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" autocomplete="name">
+            <span class="campo__error" id="error-nombre"></span>
+          </div>
+
+          <div class="campo">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="tuemail@ejemplo.com" autocomplete="email">
+            <span class="campo__error" id="error-email"></span>
+          </div>
+
+          <div class="campo">
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribí tu mensaje..."></textarea>
+            <span class="campo__contador" id="contador-mensaje">0 / 500</span>
+            <span class="campo__error" id="error-mensaje"></span>
+          </div>
+
+          <button type="submit" class="boton boton--principal">Enviar mensaje</button>
+
+          <!-- Acá JavaScript muestra el mensaje de confirmación -->
+          <p id="respuesta-formulario" class="respuesta" role="status" hidden></p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== PIE DE PÁGINA ===================== -->
+  <footer class="pie">
+    <p>&copy; <span id="anio">2026</span> Paolo Landó · Hecho con HTML, CSS y JavaScript</p>
+  </footer>
+
+  <!-- El script va al final para que el HTML ya esté cargado cuando se ejecute -->
+  <script src="js/script.js"></script>
+</body>
+</html>
