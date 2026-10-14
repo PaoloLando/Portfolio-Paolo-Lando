@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Ilustración del microservicio Currency Converter">
+  <rect width="640" height="360" fill="#0a2a5e"/>
+  <rect x="40" y="40" width="560" height="280" rx="16" fill="#0f3a7d" stroke="#f6c500" stroke-width="3"/>
+  <!-- Ventana tipo terminal -->
+  <rect x="40" y="40" width="560" height="40" rx="16" fill="#f6c500"/>
+  <rect x="40" y="64" width="560" height="16" fill="#f6c500"/>
+  <circle cx="70" cy="60" r="7" fill="#0a2a5e"/>
+  <circle cx="94" cy="60" r="7" fill="#0a2a5e"/>
+  <circle cx="118" cy="60" r="7" fill="#0a2a5e"/>
+  <!-- Pedido y respuesta de la API -->
+  <text x="70" y="125" font-family="monospace" font-size="20" fill="#f6c500">GET /api/rates/USD</text>
+  <text x="70" y="165" font-family="monospace" font-size="18" fill="#ffffff">{</text>
+  <text x="90" y="195" font-family="monospace" font-size="18" fill="#ffffff">"base": "USD",</text>
+  <text x="90" y="225" font-family="monospace" font-size="18" fill="#ffffff">"ARS": 1000.00,</text>
+  <text x="90" y="255" font-family="monospace" font-size="18" fill="#ffffff">"updated": "auto"</text>
+  <text x="70" y="285" font-family="monospace" font-size="18" fill="#ffffff">}</text>
+  <!-- Símbolos de moneda -->
+  <circle cx="500" cy="190" r="55" fill="#f6c500"/>
+  <text x="500" y="212" font-family="Arial, sans-serif" font-size="64" font-weight="700" text-anchor="middle" fill="#0a2a5e">$</text>
+</svg>

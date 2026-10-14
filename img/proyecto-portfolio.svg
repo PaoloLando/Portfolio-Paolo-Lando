@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Ilustración de un sitio web con etiquetas de código">
+  <rect width="640" height="360" fill="#0a2a5e"/>
+  <!-- Ventana de navegador -->
+  <rect x="50" y="40" width="540" height="280" rx="14" fill="#0f3a7d" stroke="#f6c500" stroke-width="3"/>
+  <rect x="50" y="40" width="540" height="38" rx="14" fill="#f6c500"/>
+  <rect x="50" y="62" width="540" height="16" fill="#f6c500"/>
+  <circle cx="78" cy="59" r="6" fill="#0a2a5e"/>
+  <circle cx="98" cy="59" r="6" fill="#0a2a5e"/>
+  <circle cx="118" cy="59" r="6" fill="#0a2a5e"/>
+  <!-- Barra de navegación del sitio -->
+  <rect x="75" y="100" width="490" height="26" rx="5" fill="#0a2a5e"/>
+  <rect x="90" y="109" width="60" height="8" rx="3" fill="#f6c500"/>
+  <rect x="420" y="109" width="30" height="8" rx="3" fill="#ffffff"/>
+  <rect x="465" y="109" width="30" height="8" rx="3" fill="#ffffff"/>
+  <rect x="510" y="109" width="40" height="8" rx="3" fill="#ffffff"/>
+  <!-- Contenido -->
+  <circle cx="150" cy="200" r="40" fill="#f6c500"/>
+  <rect x="215" y="170" width="200" height="14" rx="4" fill="#ffffff"/>
+  <rect x="215" y="198" width="260" height="10" rx="4" fill="#8fa6cf"/>
+  <rect x="215" y="218" width="230" height="10" rx="4" fill="#8fa6cf"/>
+  <rect x="215" y="245" width="90" height="28" rx="6" fill="#f6c500"/>
+  <!-- Etiquetas -->
+  <text x="75" y="300" font-family="monospace" font-size="16" fill="#f6c500">&lt;html&gt; &lt;css&gt; &lt;js&gt;</text>
+</svg>
