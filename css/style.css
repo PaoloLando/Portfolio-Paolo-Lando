@@ -1,0 +1,618 @@
+/* =====================================================
+   PORTFOLIO DE PAOLO LANDÓ - HOJA DE ESTILOS
+   Colores inspirados en Rosario Central (azul y amarillo)
+   ===================================================== */
+
+
+/* -----------------------------------------------------
+   1. VARIABLES DE COLOR
+   Si querés cambiar un color de todo el sitio,
+   modificá solo la variable acá arriba.
+   ----------------------------------------------------- */
+
+/* Tema oscuro (es el que se ve por defecto) */
+:root {
+  --color-fondo: #0a1f44;        /* azul oscuro de fondo */
+  --color-superficie: #102c5c;   /* azul de las tarjetas */
+  --color-borde: #1f4284;        /* azul para bordes */
+  --color-texto: #ffffff;        /* texto principal */
+  --color-texto-suave: #c3d0ea;  /* texto secundario */
+  --color-acento: #f6c500;       /* amarillo de Central */
+  --color-titulo: #f6c500;       /* títulos */
+  --color-sobre-acento: #0a1f44; /* texto que va sobre fondo amarillo */
+}
+
+/* Tema claro: se activa cuando el <html> tiene data-theme="claro" */
+:root[data-theme="claro"] {
+  --color-fondo: #f3f6fc;
+  --color-superficie: #ffffff;
+  --color-borde: #c9d5ec;
+  --color-texto: #0a1f44;
+  --color-texto-suave: #3d5280;
+  --color-acento: #f6c500;
+  --color-titulo: #0a3a8c;       /* el amarillo no se lee bien sobre blanco */
+  --color-sobre-acento: #0a1f44;
+}
+
+
+/* -----------------------------------------------------
+   2. ESTILOS GENERALES
+   ----------------------------------------------------- */
+
+/* Selector universal: hace que el ancho incluya padding y borde */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;   /* desplazamiento suave al usar los enlaces del menú */
+  scroll-padding-top: 5rem;  /* evita que el encabezado tape los títulos */
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1rem;           /* unidad relativa: 1rem = tamaño de letra del navegador */
+  line-height: 1.6;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+img {
+  max-width: 100%;           /* las imágenes nunca se pasan del ancho de su contenedor */
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: var(--color-acento);
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  color: var(--color-titulo);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+h4 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--color-texto-suave); }
+
+/* Cada sección principal queda centrada con un ancho máximo */
+.seccion {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.subtitulo {
+  margin-top: 3rem;
+}
+
+
+/* -----------------------------------------------------
+   3. ENCABEZADO Y MENÚ (Flexbox + position)
+   ----------------------------------------------------- */
+
+.encabezado {
+  position: sticky;          /* se queda fijo arriba al hacer scroll */
+  top: 0;
+  z-index: 100;              /* por encima del resto del contenido */
+  background-color: var(--color-fondo);
+  border-bottom: 2px solid var(--color-acento);
+}
+
+/* FLEXBOX: logo a la izquierda, menú en el centro y botón de tema a la derecha */
+.encabezado__contenido {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.logo span {
+  color: var(--color-acento);
+}
+
+/* FLEXBOX: los enlaces del menú quedan en fila */
+.menu__lista {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.menu__lista a {
+  color: var(--color-texto);
+  text-decoration: none;
+  font-weight: 500;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid transparent;
+}
+
+/* Pseudoclases: efecto al pasar el mouse o navegar con teclado */
+.menu__lista a:hover,
+.menu__lista a:focus {
+  color: var(--color-acento);
+  border-bottom-color: var(--color-acento);
+}
+
+.boton-tema,
+.boton-menu {
+  background-color: transparent;
+  border: 2px solid var(--color-acento);
+  color: var(--color-texto);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.boton-tema:hover,
+.boton-menu:hover {
+  background-color: var(--color-acento);
+  color: var(--color-sobre-acento);
+}
+
+/* El botón de menú está oculto en pantallas grandes */
+.boton-menu {
+  display: none;
+}
+
+
+/* -----------------------------------------------------
+   4. BOTONES
+   ----------------------------------------------------- */
+
+.boton {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid var(--color-acento);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.boton--principal {
+  background-color: var(--color-acento);
+  color: var(--color-sobre-acento);
+}
+
+.boton--secundario {
+  background-color: transparent;
+  color: var(--color-acento);
+}
+
+:root[data-theme="claro"] .boton--secundario {
+  color: var(--color-titulo);
+  border-color: var(--color-titulo);
+}
+
+.boton:hover {
+  transform: translateY(-3px);
+}
+
+
+/* -----------------------------------------------------
+   5. INICIO (Flexbox)
+   ----------------------------------------------------- */
+
+/* FLEXBOX: el texto y la imagen quedan lado a lado */
+.inicio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  min-height: 80vh;          /* vh = porcentaje del alto de la pantalla */
+}
+
+.inicio__texto {
+  flex: 1;                   /* ocupa el espacio disponible */
+}
+
+.inicio__saludo {
+  color: var(--color-acento);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+:root[data-theme="claro"] .inicio__saludo {
+  color: var(--color-titulo);
+}
+
+.inicio__rol {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0 1rem;
+}
+
+.inicio__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+/* position: relative permite ubicar el detalle decorativo con position: absolute */
+.inicio__imagen {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.inicio__imagen::before {
+  content: "";
+  position: absolute;        /* se ubica respecto a .inicio__imagen */
+  top: 1rem;
+  left: 1rem;
+  width: 100%;
+  height: 100%;
+  border: 4px solid var(--color-acento);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.inicio__imagen img {
+  position: relative;
+  z-index: 1;
+  width: 21.875rem;          /* 350px */
+  height: 21.875rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--color-fondo);
+}
+
+
+/* -----------------------------------------------------
+   6. SOBRE MÍ (Grid + Flexbox)
+   ----------------------------------------------------- */
+
+/* GRID: tres columnas iguales para las tarjetas */
+.sobre-mi__grilla {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.tarjeta {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.tarjeta p + p {             /* selector de hermano adyacente */
+  margin-top: 0.75rem;
+}
+
+.lista li {
+  margin-bottom: 0.9rem;
+  color: var(--color-texto-suave);
+}
+
+.lista li strong {
+  color: var(--color-texto);
+}
+
+.habilidades {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* FLEXBOX: las etiquetas se acomodan en filas y bajan de renglón si no entran */
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.etiquetas li {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-acento);
+  border-radius: 2rem;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+/* Las tecnologías que está aprendiendo van con fondo amarillo */
+.etiquetas--aprendiendo li {
+  background-color: var(--color-acento);
+  color: var(--color-sobre-acento);
+  font-weight: 600;
+}
+
+
+/* -----------------------------------------------------
+   7. PROYECTOS (Grid)
+   ----------------------------------------------------- */
+
+.buscador {
+  display: flex;
+  flex-direction: column;
+  max-width: 24rem;
+  margin-bottom: 2rem;
+  gap: 0.4rem;
+}
+
+.buscador label {
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+}
+
+/* GRID: tarjetas de proyectos que se adaptan solas al ancho disponible */
+.proyectos__grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.5rem;
+}
+
+.proyecto {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.proyecto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+}
+
+.proyecto__imagen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.proyecto__cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.proyecto__estado {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 1rem;
+  margin-bottom: 0.6rem;
+  background-color: var(--color-acento);
+  color: var(--color-sobre-acento);
+}
+
+.proyecto__descripcion {
+  color: var(--color-texto-suave);
+  margin-bottom: 1rem;
+}
+
+.proyecto__tecnologias {
+  margin-bottom: 1.25rem;
+}
+
+/* margin-top: auto empuja el enlace siempre al final de la tarjeta */
+.proyecto__enlace {
+  margin-top: auto;
+}
+
+.mensaje-vacio {
+  color: var(--color-texto-suave);
+  font-style: italic;
+}
+
+/* El atributo hidden oculta el elemento */
+[hidden] {
+  display: none !important;
+}
+
+
+/* -----------------------------------------------------
+   8. CONTACTO Y FORMULARIO (Grid)
+   ----------------------------------------------------- */
+
+/* GRID: dos columnas, datos a la izquierda y formulario a la derecha */
+.contacto__contenido {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.contacto__datos p {
+  margin-bottom: 1rem;
+  color: var(--color-texto-suave);
+}
+
+.lista--enlaces a {
+  word-break: break-all;
+}
+
+:root[data-theme="claro"] a {
+  color: var(--color-titulo);
+}
+
+.formulario {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 0.75rem;
+  padding: 1.75rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.campo label {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+/* Selectores de atributo: aplican a distintos tipos de campo */
+input[type="text"],
+input[type="email"],
+input[type="search"],
+textarea {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  border: 2px solid var(--color-borde);
+  border-radius: 0.5rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-acento);
+}
+
+/* Clases que agrega JavaScript según el resultado de la validación */
+.campo--error input,
+.campo--error textarea {
+  border-color: #ff6b6b;
+}
+
+.campo--ok input,
+.campo--ok textarea {
+  border-color: #4cd18a;
+}
+
+.campo__error {
+  min-height: 1.2rem;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: #ff6b6b;
+}
+
+.campo__contador {
+  align-self: flex-end;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.respuesta {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.respuesta--ok {
+  background-color: rgba(76, 209, 138, 0.15);
+  border: 1px solid #4cd18a;
+  color: #4cd18a;
+}
+
+:root[data-theme="claro"] .respuesta--ok {
+  color: #0b7a43;
+}
+
+
+/* -----------------------------------------------------
+   9. PIE DE PÁGINA
+   ----------------------------------------------------- */
+
+.pie {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: var(--color-superficie);
+  border-top: 2px solid var(--color-acento);
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+
+/* -----------------------------------------------------
+   10. RESPONSIVE (media queries)
+   ----------------------------------------------------- */
+
+/* Tablets y pantallas medianas (hasta 900px) */
+@media (max-width: 900px) {
+  .sobre-mi__grilla {
+    grid-template-columns: 1fr;       /* una sola columna */
+  }
+
+  .contacto__contenido {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Celulares (hasta 768px) */
+@media (max-width: 768px) {
+  h1 { font-size: 2.3rem; }
+  h2 { font-size: 1.7rem; }
+
+  /* Se muestra el botón de menú y el menú pasa a estar desplegable */
+  .boton-menu {
+    display: block;
+  }
+
+  .menu {
+    display: none;                    /* oculto hasta que se toque el botón */
+    position: absolute;
+    top: 100%;                        /* justo debajo del encabezado */
+    left: 0;
+    width: 100%;
+    background-color: var(--color-fondo);
+    border-bottom: 2px solid var(--color-acento);
+    padding: 1rem 1.5rem;
+  }
+
+  /* JavaScript agrega esta clase al tocar el botón de menú */
+  .menu--abierto {
+    display: block;
+  }
+
+  .menu__lista {
+    flex-direction: column;           /* los enlaces pasan a ir uno debajo del otro */
+    gap: 1rem;
+  }
+
+  /* El inicio pasa a ser una columna con la imagen arriba */
+  .inicio {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    min-height: auto;
+  }
+
+  .inicio__botones {
+    justify-content: center;
+  }
+
+  .inicio__imagen img {
+    width: 15rem;
+    height: 15rem;
+  }
+}
