@@ -50,17 +50,11 @@ portfolio-paolo-lando/
 
 No necesita instalación. Hay dos formas de verlo:
 
-1. Descargar o clonar el repositorio y abrir el archivo `index.html` en el navegador.
+- Descargar o clonar el repositorio y abrir el archivo `index.html` en el navegador:
 
    ```bash
    git clone https://github.com/PaoloLando/portfolio-paolo-lando.git
    ```
-
-2. Entrar al sitio publicado (ver el enlace de abajo).
-
-## Sitio publicado
-
-https://paololando.github.io/portfolio-paolo-lando/
 
 ## Contacto
 
