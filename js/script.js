@@ -44,8 +44,8 @@ const proyectos = [
       "Guarda los datos con Spring Data JPA y H2, actualiza las cotizaciones en segundo plano con @Scheduled, " +
       "maneja excepciones de forma global y tiene pruebas unitarias con JUnit 5 y Mockito. Está empaquetado en un contenedor Docker.",
     tecnologias: ["Java 17", "Spring Boot 3.2", "Spring Data JPA", "H2", "JUnit 5", "Mockito", "Docker"],
-    imagen: "img/proyecto-currency.svg",
-    textoImagen: "Ilustración de una respuesta de la API de conversión de monedas",
+    imagen: "img/proyecto-currency.png",
+    textoImagen: "Captura de Postman: petición GET a /api/monedas/convertir y su respuesta JSON con el resultado en dólares",
     enlace: "https://github.com/PaoloLando/currency-converter-service",
     textoEnlace: "Ver en GitHub",
     estado: "Terminado"
@@ -59,8 +59,8 @@ const proyectos = [
       "En la rama feat/category-manager empecé el componente CategoryManager para administrar categorías. " +
       "El backend lo desarrollan mis compañeros.",
     tecnologias: ["React", "TypeScript", "Vite", "Git", "GitHub"],
-    imagen: "img/proyecto-aprendofacil.svg",
-    textoImagen: "Ilustración del formulario de login y del gestor de categorías",
+    imagen: "img/proyecto-aprendofacil.png",
+    textoImagen: "Captura de la pantalla de inicio de sesión de Aprendo Fácil",
     enlace: "https://github.com/Michibikii/aprendofacil-web",
     textoEnlace: "Ver repositorio del equipo",
     estado: "En desarrollo"
@@ -71,8 +71,8 @@ const proyectos = [
       "Mi portfolio personal, hecho desde cero. Tiene diseño responsive con Flexbox y Grid, " +
       "modo oscuro y claro, un buscador de proyectos y un formulario de contacto validado con JavaScript.",
     tecnologias: ["HTML", "CSS", "JavaScript", "Git", "GitHub"],
-    imagen: "img/proyecto-portfolio.svg",
-    textoImagen: "Ilustración de un sitio web con barra de navegación",
+    imagen: "img/proyecto-portfolio.png",
+    textoImagen: "Captura de la página de Inicio de este portfolio",
     enlace: "https://github.com/PaoloLando/portfolio-paolo-lando",
     textoEnlace: "Ver en GitHub",
     estado: "Terminado"

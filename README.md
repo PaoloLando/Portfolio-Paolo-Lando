@@ -39,22 +39,28 @@ portfolio-paolo-lando/
 │
 ├── img/
 │   ├── foto-paolo.jpg
-│   ├── proyecto-currency.svg
-│   ├── proyecto-aprendofacil.svg
-│   └── proyecto-portfolio.svg
+│   ├── proyecto-currency.png
+│   ├── proyecto-aprendofacil.png
+│   └── proyecto-portfolio.png
 │
 └── README.md
 ```
 
 ## Cómo visualizar el proyecto
 
-No necesita instalación:
+No necesita instalación. Hay dos formas de verlo:
 
-- Descargar o clonar el repositorio y abrir el archivo `index.html` en el navegador.
+1. Descargar o clonar el repositorio y abrir el archivo `index.html` en el navegador.
 
    ```bash
    git clone https://github.com/PaoloLando/portfolio-paolo-lando.git
    ```
+
+2. Entrar al sitio publicado (ver el enlace de abajo).
+
+## Sitio publicado
+
+https://paololando.github.io/portfolio-paolo-lando/
 
 ## Contacto
 
