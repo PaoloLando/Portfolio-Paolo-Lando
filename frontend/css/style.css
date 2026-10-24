@@ -616,3 +616,162 @@ textarea:focus {
     height: 15rem;
   }
 }
+
+
+/* -----------------------------------------------------
+   11. PÁGINA DE ADMINISTRACIÓN (admin.html)
+   ----------------------------------------------------- */
+
+.titulo-admin {
+  font-size: 2.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin__intro {
+  color: var(--color-texto-suave);
+  margin-bottom: 2rem;
+  max-width: 45rem;
+}
+
+/* GRID: formulario a la izquierda y tabla a la derecha */
+.admin__contenido {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Los <select> se ven igual que los demás campos */
+select {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  border: 2px solid var(--color-borde);
+  border-radius: 0.5rem;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-acento);
+}
+
+.boton--chico {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.boton--peligro {
+  background-color: transparent;
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.boton--peligro:hover {
+  background-color: #ff6b6b;
+  color: #ffffff;
+}
+
+:root[data-theme="claro"] .boton--peligro {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+:root[data-theme="claro"] .boton--peligro:hover {
+  background-color: #c0392b;
+  color: #ffffff;
+}
+
+.botones-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.respuesta--error {
+  background-color: rgba(255, 107, 107, 0.12);
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+}
+
+:root[data-theme="claro"] .respuesta--error {
+  color: #b02a1c;
+}
+
+.respuesta__lista {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+  font-weight: 400;
+}
+
+/* Tabla de proyectos */
+.tabla-contenedor {
+  overflow-x: auto;   /* en pantallas chicas la tabla se desplaza sin romper la página */
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla th {
+  color: var(--color-titulo);
+}
+
+/* "Insignias" de estado de publicación */
+.insignia {
+  display: inline-block;
+  padding: 0.1rem 0.7rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.insignia--publicado {
+  background-color: rgba(76, 209, 138, 0.18);
+  color: #4cd18a;
+  border: 1px solid #4cd18a;
+}
+
+.insignia--borrador {
+  background-color: rgba(195, 208, 234, 0.12);
+  color: var(--color-texto-suave);
+  border: 1px solid var(--color-texto-suave);
+}
+
+:root[data-theme="claro"] .insignia--publicado {
+  color: #0b7a43;
+  border-color: #0b7a43;
+}
+
+/* Enlace del pie de página */
+.pie a {
+  color: var(--color-acento);
+}
+
+:root[data-theme="claro"] .pie a {
+  color: var(--color-titulo);
+}
+
+/* min-width: 0 permite que cada columna del grid se encoja y que la tabla se desplace dentro de su contenedor */
+.admin__contenido > section {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .admin__contenido {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

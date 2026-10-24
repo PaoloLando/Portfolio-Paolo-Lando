@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!-- Página de administración: CRUD de proyectos (crear, modificar y eliminar) -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrar proyectos | Paolo Landó</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="encabezado">
+    <div class="encabezado__contenido">
+      <a href="index.html" class="logo">PL<span>.</span></a>
+      <a href="index.html#proyectos" class="boton boton--secundario boton--chico">← Volver al portfolio</a>
+    </div>
+  </header>
+
+  <main class="seccion">
+    <h1 class="titulo-admin">Administrar proyectos</h1>
+    <p class="admin__intro">
+      Desde acá se crean, modifican y eliminan los proyectos que se guardan en la base de datos.
+      Solo los proyectos con estado <strong>publicado</strong> se muestran en el portfolio.
+    </p>
+
+    <div class="admin__contenido">
+
+      <!-- ============ FORMULARIO (CREAR / MODIFICAR) ============ -->
+      <section>
+        <h2 id="titulo-formulario">Nuevo proyecto</h2>
+
+        <form id="formulario-proyecto" class="formulario" novalidate>
+          <!-- Campo oculto: si tiene un valor, el formulario MODIFICA ese proyecto; si está vacío, CREA uno nuevo -->
+          <input type="hidden" id="proyecto-id">
+
+          <div class="campo">
+            <label for="proyecto-nombre">Nombre</label>
+            <input type="text" id="proyecto-nombre" placeholder="Ej: Mi proyecto" maxlength="100">
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-descripcion">Descripción</label>
+            <textarea id="proyecto-descripcion" rows="5" placeholder="Qué hace el proyecto y cuál fue tu parte..."></textarea>
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-tecnologias">Tecnologías (separadas por coma)</label>
+            <input type="text" id="proyecto-tecnologias" placeholder="Ej: Java, Spring Boot, Docker">
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-imagen">Imagen (ruta o URL)</label>
+            <input type="text" id="proyecto-imagen" placeholder="Ej: img/proyecto-nuevo.png">
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-enlace">Enlace (repositorio o sitio)</label>
+            <input type="text" id="proyecto-enlace" placeholder="https://github.com/...">
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-avance">Avance</label>
+            <select id="proyecto-avance">
+              <option value="En desarrollo">En desarrollo</option>
+              <option value="Terminado">Terminado</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="proyecto-estado">Estado de publicación</label>
+            <select id="proyecto-estado">
+              <option value="publicado">Publicado (se ve en el portfolio)</option>
+              <option value="borrador">Borrador (oculto)</option>
+            </select>
+          </div>
+
+          <div class="botones-fila">
+            <button type="submit" id="boton-guardar" class="boton boton--principal">Crear proyecto</button>
+            <button type="button" id="boton-cancelar" class="boton boton--secundario" hidden>Cancelar edición</button>
+          </div>
+
+          <!-- Acá JavaScript muestra el resultado de la operación o los errores que devuelve el servidor -->
+          <div id="mensaje-admin" class="respuesta" role="status" hidden></div>
+        </form>
+      </section>
+
+      <!-- ============ LISTA DE PROYECTOS ============ -->
+      <section>
+        <h2>Proyectos guardados</h2>
+        <p id="mensaje-tabla" class="mensaje-vacio">Cargando...</p>
+
+        <div class="tabla-contenedor">
+          <table class="tabla" id="tabla-proyectos" hidden>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Avance</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <!-- Las filas las crea JavaScript con los datos de la API -->
+            <tbody id="cuerpo-tabla"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="pie">
+    <p>&copy; Paolo Landó · Panel de administración del portfolio</p>
+  </footer>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
