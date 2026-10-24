@@ -156,10 +156,13 @@
         <input type="search" id="buscador-proyectos" placeholder="Ej: Java, React, Docker...">
       </div>
 
-      <!-- Las tarjetas las crea JavaScript a partir del arreglo "proyectos" (js/script.js) -->
+      <!-- Mensaje mientras se cargan los proyectos (o si el servidor no responde) -->
+      <p id="mensaje-carga" class="mensaje-vacio">Cargando proyectos...</p>
+
+      <!-- Las tarjetas las crea JavaScript con los datos que devuelve la API (js/script.js) -->
       <div id="lista-proyectos" class="proyectos__grilla"></div>
 
-      <p id="sin-resultados" class="mensaje-vacio" hidden>No encontré ningún proyecto con esa búsqueda.</p>
+      <p id="sin-resultados" class="mensaje-vacio" hidden></p>
     </section>
 
     <!-- ===================== CONTACTO ===================== -->
@@ -211,7 +214,8 @@
 
   <!-- ===================== PIE DE PÁGINA ===================== -->
   <footer class="pie">
-    <p>&copy; <span id="anio">2026</span> Paolo Landó · Hecho con HTML, CSS y JavaScript</p>
+    <p>&copy; <span id="anio">2026</span> Paolo Landó · Hecho con HTML, CSS, JavaScript y Node.js</p>
+    <p><a href="admin.html">Administrar proyectos</a></p>
   </footer>
 
   <!-- El script va al final para que el HTML ya esté cargado cuando se ejecute -->

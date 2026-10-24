@@ -1,9 +1,9 @@
 /* =====================================================
-   PORTFOLIO DE PAOLO LANDÓ - JAVASCRIPT
+   PORTFOLIO DE PAOLO LANDÓ - JAVASCRIPT (página principal)
    Qué hace este archivo:
    1. Cambia entre modo oscuro y claro
    2. Abre y cierra el menú en celulares
-   3. Crea las tarjetas de proyectos desde un arreglo
+   3. Pide los proyectos a la API (backend) y crea las tarjetas
    4. Filtra los proyectos mientras se escribe
    5. Valida el formulario de contacto
    ===================================================== */
@@ -19,6 +19,7 @@ const botonTema = document.getElementById("boton-tema");
 const botonMenu = document.getElementById("boton-menu");
 const menu = document.getElementById("menu");
 const listaProyectos = document.getElementById("lista-proyectos");
+const mensajeCarga = document.getElementById("mensaje-carga");
 const buscador = document.getElementById("buscador-proyectos");
 const sinResultados = document.getElementById("sin-resultados");
 const formulario = document.getElementById("formulario");
@@ -31,53 +32,16 @@ const respuestaFormulario = document.getElementById("respuesta-formulario");
 // Constante numérica: máximo de caracteres del mensaje
 const MAX_MENSAJE = 500;
 
+// Dirección de la API del backend. Es una ruta relativa porque el mismo servidor
+// Express entrega esta página y la API, así que están en el mismo origen.
+const API_PROYECTOS = "/api/proyectos";
+
 // Variable que guarda el tema actual (string)
 let temaActual = "oscuro";
 
-// Arreglo de objetos: cada objeto es un proyecto.
-// Si querés agregar o cambiar un proyecto, se hace acá y la página se actualiza sola.
-const proyectos = [
-  {
-    nombre: "Currency Converter Microservice",
-    descripcion:
-      "Refactoricé una aplicación de escritorio hecha en Java Swing y la convertí en un microservicio REST desacoplado. " +
-      "Guarda los datos con Spring Data JPA y H2, actualiza las cotizaciones en segundo plano con @Scheduled, " +
-      "maneja excepciones de forma global y tiene pruebas unitarias con JUnit 5 y Mockito. Está empaquetado en un contenedor Docker.",
-    tecnologias: ["Java 17", "Spring Boot 3.2", "Spring Data JPA", "H2", "JUnit 5", "Mockito", "Docker"],
-    imagen: "img/proyecto-currency.png",
-    textoImagen: "Captura de Postman: petición GET a /api/monedas/convertir y su respuesta JSON con el resultado en dólares",
-    enlace: "https://github.com/PaoloLando/currency-converter-service",
-    textoEnlace: "Ver en GitHub",
-    estado: "Terminado"
-  },
-  {
-    nombre: "Aprendo Fácil Web",
-    descripcion:
-      "Proyecto en equipo (4 personas), todavía en desarrollo. Mi parte es el frontend. " +
-      "En la rama feat/login-form-integration integré el formulario de login (LoginForm) con el endpoint /api/auth/login, " +
-      "configuré TypeScript y Vite, y resolví los conflictos de integración con develop. " +
-      "En la rama feat/category-manager empecé el componente CategoryManager para administrar categorías. " +
-      "El backend lo desarrollan mis compañeros.",
-    tecnologias: ["React", "TypeScript", "Vite", "Git", "GitHub"],
-    imagen: "img/proyecto-aprendofacil.png",
-    textoImagen: "Captura de la pantalla de inicio de sesión de Aprendo Fácil",
-    enlace: "https://github.com/Michibikii/aprendofacil-web",
-    textoEnlace: "Ver repositorio del equipo",
-    estado: "En desarrollo"
-  },
-  {
-    nombre: "Este portfolio",
-    descripcion:
-      "Mi portfolio personal, hecho desde cero. Tiene diseño responsive con Flexbox y Grid, " +
-      "modo oscuro y claro, un buscador de proyectos y un formulario de contacto validado con JavaScript.",
-    tecnologias: ["HTML", "CSS", "JavaScript", "Git", "GitHub"],
-    imagen: "img/proyecto-portfolio.png",
-    textoImagen: "Captura de la página de Inicio de este portfolio",
-    enlace: "https://github.com/PaoloLando/portfolio-paolo-lando",
-    textoEnlace: "Ver en GitHub",
-    estado: "Terminado"
-  }
-];
+// Arreglo donde guardo los proyectos que responde el servidor.
+// Antes estaban escritos acá a mano; ahora vienen de la base de datos.
+let proyectos = [];
 
 
 /* -----------------------------------------------------
@@ -144,26 +108,32 @@ enlacesMenu.forEach(function (enlace) {
 
 
 /* -----------------------------------------------------
-   3. CREAR LAS TARJETAS DE PROYECTOS
+   3. PROYECTOS: PEDIRLOS AL BACKEND Y CREAR LAS TARJETAS
    ----------------------------------------------------- */
 
-// Función que recibe un proyecto (objeto) y devuelve la tarjeta HTML ya armada
+// Función que recibe un proyecto (objeto) y devuelve la tarjeta HTML ya armada.
+// Uso textContent (y no innerHTML) para que el texto se muestre tal cual
+// y nadie pueda meter código HTML en un proyecto.
 function crearTarjeta(proyecto) {
   // createElement crea un elemento nuevo
   const tarjeta = document.createElement("article");
   tarjeta.classList.add("proyecto");
 
-  const imagen = document.createElement("img");
-  imagen.classList.add("proyecto__imagen");
-  imagen.src = proyecto.imagen;
-  imagen.alt = proyecto.textoImagen;
+  // La imagen es opcional: solo la agrego si el proyecto tiene una
+  if (proyecto.imagen) {
+    const imagen = document.createElement("img");
+    imagen.classList.add("proyecto__imagen");
+    imagen.src = proyecto.imagen;
+    imagen.alt = "Captura del proyecto " + proyecto.nombre;
+    tarjeta.appendChild(imagen);
+  }
 
   const cuerpo = document.createElement("div");
   cuerpo.classList.add("proyecto__cuerpo");
 
-  const estado = document.createElement("span");
-  estado.classList.add("proyecto__estado");
-  estado.textContent = proyecto.estado;
+  const avance = document.createElement("span");
+  avance.classList.add("proyecto__estado");
+  avance.textContent = proyecto.avance;
 
   const titulo = document.createElement("h3");
   titulo.textContent = proyecto.nombre;
@@ -181,21 +151,23 @@ function crearTarjeta(proyecto) {
     tecnologias.appendChild(item);
   }
 
-  const enlace = document.createElement("a");
-  enlace.classList.add("boton", "boton--principal", "proyecto__enlace");
-  enlace.href = proyecto.enlace;
-  enlace.target = "_blank";
-  enlace.rel = "noopener noreferrer";
-  enlace.textContent = proyecto.textoEnlace;
-
   // appendChild mete un elemento dentro de otro
-  cuerpo.appendChild(estado);
+  cuerpo.appendChild(avance);
   cuerpo.appendChild(titulo);
   cuerpo.appendChild(descripcion);
   cuerpo.appendChild(tecnologias);
-  cuerpo.appendChild(enlace);
 
-  tarjeta.appendChild(imagen);
+  // El enlace también es opcional
+  if (proyecto.enlace) {
+    const enlace = document.createElement("a");
+    enlace.classList.add("boton", "boton--principal", "proyecto__enlace");
+    enlace.href = proyecto.enlace;
+    enlace.target = "_blank";
+    enlace.rel = "noopener noreferrer";
+    enlace.textContent = "Ver proyecto";
+    cuerpo.appendChild(enlace);
+  }
+
   tarjeta.appendChild(cuerpo);
 
   return tarjeta;
@@ -209,12 +181,45 @@ function mostrarProyectos(lista) {
     listaProyectos.appendChild(crearTarjeta(proyecto));
   });
 
-  // Si no hay proyectos para mostrar, aparece el mensaje; si hay, se oculta
+  // Si no hay nada para mostrar, aparece un mensaje; si hay, se oculta
+  if (lista.length === 0) {
+    // Distingo si no hay proyectos cargados o si la búsqueda no encontró ninguno
+    sinResultados.textContent =
+      proyectos.length === 0
+        ? "Todavía no hay proyectos publicados."
+        : "No encontré ningún proyecto con esa búsqueda.";
+  }
   sinResultados.hidden = lista.length > 0;
 }
 
-// Al abrir la página muestro todos los proyectos
-mostrarProyectos(proyectos);
+// Función ASÍNCRONA: pide los proyectos al servidor.
+// "async/await" permite esperar la respuesta de la red sin trabar la página.
+async function cargarProyectos() {
+  try {
+    // fetch hace una petición HTTP GET a la API y espera la respuesta
+    const respuesta = await fetch(API_PROYECTOS);
+
+    // respuesta.ok es false si el servidor devolvió un error (404, 500, etc.)
+    if (!respuesta.ok) {
+      throw new Error("El servidor respondió con el código " + respuesta.status);
+    }
+
+    // Convierto el JSON de la respuesta en un arreglo de objetos de JavaScript
+    proyectos = await respuesta.json();
+
+    mensajeCarga.hidden = true;
+    mostrarProyectos(proyectos);
+  } catch (error) {
+    // Si falla (por ejemplo, el backend está apagado), aviso al usuario
+    console.error("No se pudieron cargar los proyectos:", error);
+    mensajeCarga.textContent =
+      "No se pudieron cargar los proyectos. Verificá que el servidor esté encendido.";
+    mensajeCarga.hidden = false;
+  }
+}
+
+// Al abrir la página pido los proyectos
+cargarProyectos();
 
 
 /* -----------------------------------------------------
