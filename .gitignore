@@ -1,0 +1,17 @@
+# Dependencias (se vuelven a instalar con "npm install")
+node_modules/
+
+# Variables de entorno y credenciales: NO se suben al repositorio
+.env
+
+# Base de datos local (se genera con "npm run seed"; el esquema está en backend/db/schema.sql)
+backend/data/
+*.db
+*.db-journal
+*.sqlite
+
+# Archivos generados y del sistema
+dist/
+*.log
+.DS_Store
+Thumbs.db
