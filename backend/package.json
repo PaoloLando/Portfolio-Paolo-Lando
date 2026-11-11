@@ -1,7 +1,7 @@
 {
   "name": "portfolio-backend",
   "version": "1.0.0",
-  "description": "Backend del portfolio de Paolo Landó: API REST con Express, TypeScript y SQLite",
+  "description": "Backend del portfolio: Express, TypeScript, SQLite y autenticación",
   "type": "module",
   "private": true,
   "engines": {

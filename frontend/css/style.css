@@ -775,3 +775,24 @@ select:focus {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Módulos agregados del recuperatorio: conservan la identidad visual original. */
+.contenido-dinamico { margin-top: 2.5rem; }
+.contenido-dinamico .habilidades__grupo { background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: .75rem; padding: 1.25rem; }
+.login-admin { max-width: 32rem; margin: 2rem auto; }
+.login-admin > p { color: var(--color-texto-suave); margin-bottom: 1rem; }
+.admin-tabs { margin: 1.5rem 0 2rem; }
+.admin-tab.activo { background: var(--color-acento); color: #fff; border-color: var(--color-acento); }
+.admin-modulo > h2 { margin-bottom: 1.5rem; }
+.admin-modulo h3 { margin-bottom: 1rem; }
+.admin__contenido .formulario { margin-bottom: 1.5rem; }
+.admin__contenido input[type="password"],
+.admin__contenido input[type="month"],
+.login-admin input[type="password"] {
+  width: 100%; padding: .7rem .9rem; font: inherit; color: var(--color-texto);
+  background: var(--color-fondo); border: 2px solid var(--color-borde); border-radius: .5rem;
+}
+.admin__contenido input:focus, .login-admin input:focus { outline: none; border-color: var(--color-acento); }
+.admin__contenido input[type="checkbox"] { width: auto; margin-right: .5rem; }
+.admin__contenido label:has(input[type="checkbox"]) { display: flex; align-items: center; }

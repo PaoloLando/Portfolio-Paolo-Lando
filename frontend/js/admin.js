@@ -1,282 +1,139 @@
-/* =====================================================
-   ADMINISTRACIÓN DE PROYECTOS (CRUD)
-   Esta página se comunica con la API del backend con fetch:
+/* Panel administrativo: la API valida los permisos en el servidor. */
+const $ = (id) => document.getElementById(id);
+const API = "/api";
+let token = localStorage.getItem("portfolio_token") || "";
+let proyectos = [], habilidades = [], formaciones = [];
 
-     Consultar -> GET    /api/proyectos?todos=1
-     Crear     -> POST   /api/proyectos
-     Modificar -> PUT    /api/proyectos/:id
-     Eliminar  -> DELETE /api/proyectos/:id
-   ===================================================== */
-
-// Dirección de la API (ruta relativa: el mismo servidor entrega esta página y la API)
-const API = "/api/proyectos";
-
-// Elementos del HTML
-const formulario = document.getElementById("formulario-proyecto");
-const tituloFormulario = document.getElementById("titulo-formulario");
-const campoId = document.getElementById("proyecto-id");
-const campoNombre = document.getElementById("proyecto-nombre");
-const campoDescripcion = document.getElementById("proyecto-descripcion");
-const campoTecnologias = document.getElementById("proyecto-tecnologias");
-const campoImagen = document.getElementById("proyecto-imagen");
-const campoEnlace = document.getElementById("proyecto-enlace");
-const campoAvance = document.getElementById("proyecto-avance");
-const campoEstado = document.getElementById("proyecto-estado");
-const botonGuardar = document.getElementById("boton-guardar");
-const botonCancelar = document.getElementById("boton-cancelar");
-const mensajeAdmin = document.getElementById("mensaje-admin");
-const mensajeTabla = document.getElementById("mensaje-tabla");
-const tabla = document.getElementById("tabla-proyectos");
-const cuerpoTabla = document.getElementById("cuerpo-tabla");
-
-// Arreglo con los proyectos que hay en la base (se actualiza cada vez que se carga la tabla)
-let proyectos = [];
-
-// Aplico el tema (oscuro/claro) que se eligió en la página principal
-try {
-  if (localStorage.getItem("tema") === "claro") {
-    document.documentElement.setAttribute("data-theme", "claro");
+function headers(json = true) {
+  const h = {};
+  if (json) h["Content-Type"] = "application/json";
+  if (token) h.Authorization = `Bearer ${token}`;
+  return h;
+}
+async function request(url, options = {}) {
+  const response = await fetch(API + url, { ...options, headers: { ...headers(options.body !== undefined), ...(options.headers || {}) } });
+  if (response.status === 401) {
+    cerrarSesion(false);
+    throw new Error("Tu sesión venció. Iniciá sesión nuevamente.");
   }
-} catch (error) {
-  console.log("No se pudo leer el tema guardado:", error);
+  if (response.status === 204) return null;
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "No se pudo completar la operación.");
+  return data;
 }
-
-
-/* -----------------------------------------------------
-   MENSAJES PARA EL USUARIO
-   ----------------------------------------------------- */
-
-// Muestra un mensaje de éxito
-function mostrarOk(texto) {
-  mensajeAdmin.className = "respuesta respuesta--ok";
-  mensajeAdmin.textContent = texto;
-  mensajeAdmin.hidden = false;
+function mensaje(id, texto, error = false) {
+  const el = $(id); el.textContent = texto; el.className = "respuesta " + (error ? "respuesta--error" : "respuesta--ok"); el.hidden = false;
 }
-
-// Muestra un mensaje de error. "detalles" es la lista de errores de validación (opcional)
-function mostrarError(texto, detalles) {
-  mensajeAdmin.className = "respuesta respuesta--error";
-  mensajeAdmin.textContent = texto;
-
-  if (detalles && detalles.length > 0) {
-    const lista = document.createElement("ul");
-    lista.classList.add("respuesta__lista");
-    detalles.forEach(function (detalle) {
-      const item = document.createElement("li");
-      item.textContent = detalle;
-      lista.appendChild(item);
-    });
-    mensajeAdmin.appendChild(lista);
-  }
-  mensajeAdmin.hidden = false;
+function celda(fila, texto) { const td = document.createElement("td"); td.textContent = texto ?? ""; fila.appendChild(td); }
+function botonAccion(texto, clase, callback) {
+  const b = document.createElement("button"); b.type = "button"; b.className = `boton ${clase} boton--chico`; b.textContent = texto; b.addEventListener("click", callback); return b;
 }
-
-
-/* -----------------------------------------------------
-   CONSULTAR (READ): cargar la tabla
-   ----------------------------------------------------- */
-
-// Función ASÍNCRONA: pide todos los proyectos (incluidos los borradores) y dibuja la tabla
-async function cargarTabla() {
+function acciones(fila, editar, eliminar) {
+  const td = document.createElement("td"), wrap = document.createElement("div"); wrap.className = "botones-fila";
+  wrap.append(botonAccion("Editar","boton--secundario",editar),botonAccion("Eliminar","boton--peligro",eliminar)); td.appendChild(wrap); fila.appendChild(td);
+}
+function llenarTabla(idTabla, idEstado, datos, dibujar) {
+  const tabla = $(idTabla), estado = $(idEstado), cuerpo = tabla.querySelector("tbody"); cuerpo.innerHTML = "";
+  if (!datos.length) { tabla.hidden = true; estado.textContent = "Todavía no hay registros."; estado.hidden = false; return; }
+  datos.forEach(d => dibujar(cuerpo,d)); estado.hidden = true; tabla.hidden = false;
+}
+async function iniciarSesion(evento) {
+  evento.preventDefault();
   try {
-    const respuesta = await fetch(API + "?todos=1");
-    if (!respuesta.ok) {
-      throw new Error("Código " + respuesta.status);
-    }
-    proyectos = await respuesta.json();
-    dibujarTabla();
-  } catch (error) {
-    console.error("Error al cargar los proyectos:", error);
-    mensajeTabla.textContent = "No se pudieron cargar los proyectos. Verificá que el servidor esté encendido.";
-    mensajeTabla.hidden = false;
-    tabla.hidden = true;
-  }
+    const data = await request("/auth/login", { method:"POST", body:JSON.stringify({ username:$("login-username").value.trim(), password:$("login-password").value }) });
+    token = data.token; localStorage.setItem("portfolio_token",token);
+    mostrarPanel(data.username); $("form-login").reset(); await cargarTodo();
+  } catch (e) { mensaje("mensaje-login",e.message,true); }
 }
-
-// Crea una celda <td> con un texto
-function crearCelda(texto) {
-  const celda = document.createElement("td");
-  celda.textContent = texto;
-  return celda;
+function mostrarPanel(username) {
+  $("vista-login").hidden = true; $("vista-panel").hidden = false; $("boton-logout").hidden = false;
+  $("bienvenida-admin").textContent = `Sesión iniciada como ${username}.`;
 }
+function cerrarSesion(mostrar = true) {
+  token = ""; localStorage.removeItem("portfolio_token");
+  $("vista-login").hidden = false; $("vista-panel").hidden = true; $("boton-logout").hidden = true;
+  if (mostrar) mensaje("mensaje-login","Sesión cerrada correctamente.");
+}
+async function verificarSesion() {
+  if (!token) return;
+  try { const data = await request("/auth/me"); mostrarPanel(data.usuario.username); await cargarTodo(); }
+  catch { cerrarSesion(false); }
+}
+$("form-login").addEventListener("submit", iniciarSesion);
+$("boton-logout").addEventListener("click", () => cerrarSesion());
+document.querySelectorAll(".admin-tab").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll(".admin-tab").forEach(b => b.classList.remove("activo"));
+  btn.classList.add("activo");
+  document.querySelectorAll(".admin-modulo").forEach(m => m.hidden = true);
+  $("modulo-" + btn.dataset.modulo).hidden = false;
+}));
 
-// Dibuja una fila por cada proyecto
-function dibujarTabla() {
-  cuerpoTabla.innerHTML = "";
+async function cargarTodo() { await Promise.all([cargarProyectos(),cargarHabilidades(),cargarFormaciones()]); }
 
-  if (proyectos.length === 0) {
-    mensajeTabla.textContent = "Todavía no hay proyectos guardados.";
-    mensajeTabla.hidden = false;
-    tabla.hidden = true;
-    return;
-  }
-
-  mensajeTabla.hidden = true;
-  tabla.hidden = false;
-
-  proyectos.forEach(function (proyecto) {
-    const fila = document.createElement("tr");
-
-    fila.appendChild(crearCelda(proyecto.nombre));
-    fila.appendChild(crearCelda(proyecto.avance));
-
-    // Celda del estado con una "etiqueta" de color
-    const celdaEstado = document.createElement("td");
-    const etiqueta = document.createElement("span");
-    etiqueta.classList.add("insignia", "insignia--" + proyecto.estado);
-    etiqueta.textContent = proyecto.estado;
-    celdaEstado.appendChild(etiqueta);
-    fila.appendChild(celdaEstado);
-
-    // Celda con los botones Editar y Eliminar
-    const celdaAcciones = document.createElement("td");
-    const botones = document.createElement("div");
-    botones.classList.add("botones-fila");
-
-    const botonEditar = document.createElement("button");
-    botonEditar.type = "button";
-    botonEditar.classList.add("boton", "boton--secundario", "boton--chico");
-    botonEditar.textContent = "Editar";
-    // EVENTO CLICK: cargo los datos de este proyecto en el formulario
-    botonEditar.addEventListener("click", function () {
-      prepararEdicion(proyecto);
+// CRUD PROYECTOS
+async function cargarProyectos() {
+  try {
+    proyectos = await request("/proyectos?todos=1");
+    llenarTabla("tabla-proyectos","estado-proyectos",proyectos,(tbody,p)=>{
+      const tr=document.createElement("tr"); celda(tr,p.nombre); celda(tr,p.estado);
+      acciones(tr,()=>editarProyecto(p),()=>eliminarRegistro("proyectos",p.id,p.nombre,cargarProyectos)); tbody.appendChild(tr);
     });
-
-    const botonEliminar = document.createElement("button");
-    botonEliminar.type = "button";
-    botonEliminar.classList.add("boton", "boton--peligro", "boton--chico");
-    botonEliminar.textContent = "Eliminar";
-    // EVENTO CLICK: elimino este proyecto
-    botonEliminar.addEventListener("click", function () {
-      eliminarProyecto(proyecto);
-    });
-
-    botones.appendChild(botonEditar);
-    botones.appendChild(botonEliminar);
-    celdaAcciones.appendChild(botones);
-    fila.appendChild(celdaAcciones);
-
-    cuerpoTabla.appendChild(fila);
-  });
+  } catch(e) { $("estado-proyectos").textContent=e.message; }
 }
-
-
-/* -----------------------------------------------------
-   CREAR (CREATE) Y MODIFICAR (UPDATE): el formulario
-   ----------------------------------------------------- */
-
-// Vuelve el formulario al modo "crear proyecto"
-function reiniciarFormulario() {
-  formulario.reset();
-  campoId.value = "";
-  tituloFormulario.textContent = "Nuevo proyecto";
-  botonGuardar.textContent = "Crear proyecto";
-  botonCancelar.hidden = true;
+function editarProyecto(p) {
+  $("proyecto-id").value=p.id; $("proyecto-nombre").value=p.nombre; $("proyecto-descripcion").value=p.descripcion;
+  $("proyecto-tecnologias").value=p.tecnologias.join(", "); $("proyecto-imagen").value=p.imagen; $("proyecto-enlace").value=p.enlace;
+  $("proyecto-avance").value=p.avance; $("proyecto-estado").value=p.estado; $("titulo-proyecto-form").textContent="Editar proyecto";
+  $("cancelar-proyecto").hidden=false; $("form-proyecto").scrollIntoView({behavior:"smooth"});
 }
-
-// Carga un proyecto en el formulario para poder modificarlo
-function prepararEdicion(proyecto) {
-  campoId.value = proyecto.id;
-  campoNombre.value = proyecto.nombre;
-  campoDescripcion.value = proyecto.descripcion;
-  campoTecnologias.value = proyecto.tecnologias.join(", "); // el arreglo pasa a texto separado por comas
-  campoImagen.value = proyecto.imagen;
-  campoEnlace.value = proyecto.enlace;
-  campoAvance.value = proyecto.avance;
-  campoEstado.value = proyecto.estado;
-
-  tituloFormulario.textContent = "Editar proyecto #" + proyecto.id;
-  botonGuardar.textContent = "Guardar cambios";
-  botonCancelar.hidden = false;
-  mensajeAdmin.hidden = true;
-
-  formulario.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-// EVENTO CLICK: cancelar la edición
-botonCancelar.addEventListener("click", function () {
-  reiniciarFormulario();
-  mensajeAdmin.hidden = true;
+function resetProyecto() { $("form-proyecto").reset(); $("proyecto-id").value=""; $("titulo-proyecto-form").textContent="Nuevo proyecto"; $("cancelar-proyecto").hidden=true; }
+$("cancelar-proyecto").addEventListener("click",resetProyecto);
+$("form-proyecto").addEventListener("submit",async e=>{
+  e.preventDefault(); const id=$("proyecto-id").value;
+  const data={nombre:$("proyecto-nombre").value,descripcion:$("proyecto-descripcion").value,tecnologias:$("proyecto-tecnologias").value.split(",").map(x=>x.trim()).filter(Boolean),imagen:$("proyecto-imagen").value,enlace:$("proyecto-enlace").value,avance:$("proyecto-avance").value,estado:$("proyecto-estado").value};
+  try { await request("/proyectos"+(id?"/"+id:""),{method:id?"PUT":"POST",body:JSON.stringify(data)}); resetProyecto(); mensaje("mensaje-proyecto",id?"Proyecto actualizado.":"Proyecto creado."); await cargarProyectos(); }
+  catch(err){mensaje("mensaje-proyecto",err.message,true);}
 });
 
-// EVENTO SUBMIT: al enviar el formulario se crea o se modifica, según haya o no un id
-formulario.addEventListener("submit", async function (evento) {
-  evento.preventDefault(); // evita que el navegador recargue la página
-
-  // Armo el objeto con los datos del formulario.
-  // Las tecnologías se escriben separadas por coma: las convierto en un arreglo.
-  const datos = {
-    nombre: campoNombre.value,
-    descripcion: campoDescripcion.value,
-    tecnologias: campoTecnologias.value.split(",").map(function (t) {
-      return t.trim();
-    }),
-    imagen: campoImagen.value,
-    enlace: campoEnlace.value,
-    avance: campoAvance.value,
-    estado: campoEstado.value,
-  };
-
-  // Si el campo oculto tiene id, es una modificación (PUT); si no, una creación (POST)
-  const editando = campoId.value !== "";
-  const url = editando ? API + "/" + campoId.value : API;
-  const metodo = editando ? "PUT" : "POST";
-
+// CRUD HABILIDADES
+async function cargarHabilidades() {
   try {
-    const respuesta = await fetch(url, {
-      method: metodo,
-      headers: { "Content-Type": "application/json" }, // le aviso al servidor que le mando JSON
-      body: JSON.stringify(datos),                      // convierte el objeto en texto JSON
+    habilidades=await request("/habilidades");
+    llenarTabla("tabla-habilidades","estado-habilidades",habilidades,(tbody,h)=>{
+      const tr=document.createElement("tr"); celda(tr,h.nombre);celda(tr,h.categoria);celda(tr,h.nivel);
+      acciones(tr,()=>editarHabilidad(h),()=>eliminarRegistro("habilidades",h.id,h.nombre,cargarHabilidades));tbody.appendChild(tr);
     });
-
-    const resultado = await respuesta.json(); // lo que contestó el servidor
-
-    if (respuesta.ok) {
-      mostrarOk(editando ? "Proyecto modificado correctamente." : "Proyecto creado correctamente.");
-      reiniciarFormulario();
-      await cargarTabla();
-    } else {
-      // El servidor rechazó los datos (400) o no encontró el proyecto (404)
-      mostrarError(resultado.error || "No se pudo guardar el proyecto.", resultado.errores);
-    }
-  } catch (error) {
-    console.error("Error al guardar:", error);
-    mostrarError("No se pudo conectar con el servidor. Verificá que esté encendido.");
-  }
+  } catch(e){$("estado-habilidades").textContent=e.message;}
+}
+function editarHabilidad(h){$("habilidad-id").value=h.id;$("habilidad-nombre").value=h.nombre;$("habilidad-categoria").value=h.categoria;$("habilidad-nivel").value=h.nivel;$("titulo-habilidad-form").textContent="Editar habilidad";$("cancelar-habilidad").hidden=false;}
+function resetHabilidad(){$("form-habilidad").reset();$("habilidad-id").value="";$("titulo-habilidad-form").textContent="Nueva habilidad";$("cancelar-habilidad").hidden=true;}
+$("cancelar-habilidad").addEventListener("click",resetHabilidad);
+$("form-habilidad").addEventListener("submit",async e=>{
+  e.preventDefault();const id=$("habilidad-id").value;const data={nombre:$("habilidad-nombre").value,categoria:$("habilidad-categoria").value,nivel:$("habilidad-nivel").value};
+  try{await request("/habilidades"+(id?"/"+id:""),{method:id?"PUT":"POST",body:JSON.stringify(data)});resetHabilidad();mensaje("mensaje-habilidad",id?"Habilidad actualizada.":"Habilidad creada.");await cargarHabilidades();}
+  catch(err){mensaje("mensaje-habilidad",err.message,true);}
 });
 
-
-/* -----------------------------------------------------
-   ELIMINAR (DELETE)
-   ----------------------------------------------------- */
-
-async function eliminarProyecto(proyecto) {
-  // confirm muestra un cuadro de Aceptar / Cancelar
-  const confirmado = confirm('¿Seguro que querés eliminar "' + proyecto.nombre + '"? Esta acción no se puede deshacer.');
-  if (!confirmado) {
-    return;
-  }
-
-  try {
-    const respuesta = await fetch(API + "/" + proyecto.id, { method: "DELETE" });
-
-    if (respuesta.ok) {
-      mostrarOk('Proyecto "' + proyecto.nombre + '" eliminado.');
-      // Si justo estaba editando ese proyecto, limpio el formulario
-      if (campoId.value === String(proyecto.id)) {
-        reiniciarFormulario();
-      }
-      await cargarTabla();
-    } else {
-      const resultado = await respuesta.json();
-      mostrarError(resultado.error || "No se pudo eliminar el proyecto.");
-    }
-  } catch (error) {
-    console.error("Error al eliminar:", error);
-    mostrarError("No se pudo conectar con el servidor. Verificá que esté encendido.");
-  }
+// CRUD FORMACIÓN
+async function cargarFormaciones(){
+  try{formaciones=await request("/formaciones");llenarTabla("tabla-formaciones","estado-formaciones",formaciones,(tbody,f)=>{
+    const tr=document.createElement("tr");celda(tr,`${f.institucion} · ${f.titulo}`);celda(tr,`${f.fecha_inicio} – ${f.en_curso?"En curso":f.fecha_fin}`);
+    acciones(tr,()=>editarFormacion(f),()=>eliminarRegistro("formaciones",f.id,f.titulo,cargarFormaciones));tbody.appendChild(tr);
+  });}catch(e){$("estado-formaciones").textContent=e.message;}
 }
+function editarFormacion(f){$("formacion-id").value=f.id;$("formacion-institucion").value=f.institucion;$("formacion-titulo").value=f.titulo;$("formacion-descripcion").value=f.descripcion;$("formacion-inicio").value=f.fecha_inicio;$("formacion-fin").value=f.fecha_fin;$("formacion-curso").checked=f.en_curso;$("formacion-fin").disabled=f.en_curso;$("titulo-formacion-form").textContent="Editar formación";$("cancelar-formacion").hidden=false;}
+function resetFormacion(){$("form-formacion").reset();$("formacion-id").value="";$("formacion-fin").disabled=false;$("titulo-formacion-form").textContent="Nueva formación";$("cancelar-formacion").hidden=true;}
+$("formacion-curso").addEventListener("change",()=>{$("formacion-fin").disabled=$("formacion-curso").checked;if($("formacion-curso").checked)$("formacion-fin").value="";});
+$("cancelar-formacion").addEventListener("click",resetFormacion);
+$("form-formacion").addEventListener("submit",async e=>{
+  e.preventDefault();const id=$("formacion-id").value;const data={institucion:$("formacion-institucion").value,titulo:$("formacion-titulo").value,descripcion:$("formacion-descripcion").value,fecha_inicio:$("formacion-inicio").value,fecha_fin:$("formacion-fin").value,en_curso:$("formacion-curso").checked};
+  try{await request("/formaciones"+(id?"/"+id:""),{method:id?"PUT":"POST",body:JSON.stringify(data)});resetFormacion();mensaje("mensaje-formacion",id?"Formación actualizada.":"Formación creada.");await cargarFormaciones();}
+  catch(err){mensaje("mensaje-formacion",err.message,true);}
+});
 
-
-// Al abrir la página cargo la tabla
-cargarTabla();
+async function eliminarRegistro(modulo,id,nombre,recargar){
+  if(!confirm(`¿Seguro que querés eliminar "${nombre}"? Esta acción no se puede deshacer.`))return;
+  try{await request(`/${modulo}/${id}`,{method:"DELETE"});await recargar();}
+  catch(e){alert(e.message);}
+}
+verificarSesion();

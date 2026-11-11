@@ -1,31 +1,28 @@
-/* =====================================================
-   TIPOS DE TYPESCRIPT DEL PROYECTO
-   Acá se define "cómo es" un proyecto. Todo el backend usa estos tipos,
-   así si me equivoco con un campo, TypeScript me avisa antes de ejecutar.
-   ===================================================== */
-
-// Tipo unión: el estado de publicación SOLO puede valer una de estas dos opciones.
+/* Tipos e interfaces compartidos del backend. */
 export type EstadoPublicacion = "publicado" | "borrador";
-
-// Otro tipo unión: en qué punto está el proyecto.
 export type Avance = "En desarrollo" | "Terminado";
+export type Rol = "admin" | "visitante";
+export type Nivel = "Básico" | "Intermedio" | "Avanzado";
 
-// Interfaz: describe las propiedades de un proyecto y el tipo de cada una.
 export interface Proyecto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  tecnologias: string[];      // arreglo de textos
-  imagen: string;             // ruta (img/...) o URL
-  enlace: string;             // URL del repositorio o sitio
-  avance: Avance;
-  estado: EstadoPublicacion;
+  id: number; nombre: string; descripcion: string; tecnologias: string[];
+  imagen: string; enlace: string; avance: Avance; estado: EstadoPublicacion;
 }
-
-// Un proyecto nuevo es igual a Proyecto pero SIN id (el id lo asigna la base de datos).
-// Omit<...> crea ese tipo a partir del anterior, sin repetir las propiedades.
 export type ProyectoNuevo = Omit<Proyecto, "id">;
 
-// Listas con los valores permitidos (las usa la validación).
+export interface Usuario {
+  id: number; username: string; password_hash: string; rol: Rol;
+}
+export interface Habilidad {
+  id: number; nombre: string; categoria: string; nivel: Nivel;
+}
+export type HabilidadNueva = Omit<Habilidad, "id">;
+export interface Formacion {
+  id: number; institucion: string; titulo: string; descripcion: string;
+  fecha_inicio: string; fecha_fin: string; en_curso: boolean;
+}
+export type FormacionNueva = Omit<Formacion, "id">;
+
 export const ESTADOS: EstadoPublicacion[] = ["publicado", "borrador"];
 export const AVANCES: Avance[] = ["En desarrollo", "Terminado"];
+export const NIVELES: Nivel[] = ["Básico", "Intermedio", "Avanzado"];

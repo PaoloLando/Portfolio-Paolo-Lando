@@ -1,20 +1,12 @@
 /* =====================================================
-   PORTFOLIO DE PAOLO LANDÓ - JAVASCRIPT (página principal)
-   Qué hace este archivo:
-   1. Cambia entre modo oscuro y claro
-   2. Abre y cierra el menú en celulares
-   3. Pide los proyectos a la API (backend) y crea las tarjetas
-   4. Filtra los proyectos mientras se escribe
-   5. Valida el formulario de contacto
+  PORTFOLIO DE PAOLO LANDÓ - JAVASCRIPT (página principal)
    ===================================================== */
 
 
 /* -----------------------------------------------------
-   VARIABLES Y CONSTANTES
-   const = valor que no se reasigna | let = valor que puede cambiar
+  VARIABLES Y CONSTANTES
    ----------------------------------------------------- */
 
-// Elementos del HTML que vamos a usar (selección del DOM)
 const botonTema = document.getElementById("boton-tema");
 const botonMenu = document.getElementById("boton-menu");
 const menu = document.getElementById("menu");
@@ -29,30 +21,26 @@ const campoMensaje = document.getElementById("mensaje");
 const contadorMensaje = document.getElementById("contador-mensaje");
 const respuestaFormulario = document.getElementById("respuesta-formulario");
 
-// Constante numérica: máximo de caracteres del mensaje
 const MAX_MENSAJE = 500;
 
-// Dirección de la API del backend. Es una ruta relativa porque el mismo servidor
-// Express entrega esta página y la API, así que están en el mismo origen.
 const API_PROYECTOS = "/api/proyectos";
+const API_HABILIDADES = "/api/habilidades";
+const API_FORMACIONES = "/api/formaciones";
 
-// Variable que guarda el tema actual (string)
+const contenedorHabilidades = document.getElementById("habilidades-dinamicas");
+const contenedorFormacion = document.getElementById("formacion-dinamica");
+
 let temaActual = "oscuro";
-
-// Arreglo donde guardo los proyectos que responde el servidor.
-// Antes estaban escritos acá a mano; ahora vienen de la base de datos.
 let proyectos = [];
 
 
 /* -----------------------------------------------------
-   1. MODO OSCURO / CLARO
+  1. MODO OSCURO / CLARO
    ----------------------------------------------------- */
 
-// Función que aplica un tema: cambia el atributo data-theme del <html> y el ícono del botón
 function aplicarTema(tema) {
   temaActual = tema;
 
-  // Estructura de control: if / else
   if (tema === "claro") {
     document.documentElement.setAttribute("data-theme", "claro");
     botonTema.textContent = "🌙";
@@ -61,7 +49,6 @@ function aplicarTema(tema) {
     botonTema.textContent = "☀️";
   }
 
-  // Guardo la elección para que se recuerde la próxima vez (try/catch por si el navegador lo bloquea)
   try {
     localStorage.setItem("tema", tema);
   } catch (error) {
@@ -69,15 +56,14 @@ function aplicarTema(tema) {
   }
 }
 
-// EVENTO CLICK: al tocar el botón se cambia de tema
 botonTema.addEventListener("click", function () {
   const nuevoTema = temaActual === "oscuro" ? "claro" : "oscuro";
   aplicarTema(nuevoTema);
 });
 
-// Al cargar la página, recupero el tema guardado (si existe)
 try {
   const temaGuardado = localStorage.getItem("tema");
+
   if (temaGuardado === "claro") {
     aplicarTema("claro");
   }
@@ -87,18 +73,16 @@ try {
 
 
 /* -----------------------------------------------------
-   2. MENÚ PARA CELULARES
+  2. MENÚ PARA CELULARES
    ----------------------------------------------------- */
 
-// EVENTO CLICK: abre o cierra el menú agregando/quitando una clase CSS
 botonMenu.addEventListener("click", function () {
-  // classList.toggle agrega la clase si no está y la quita si está
   const abierto = menu.classList.toggle("menu--abierto");
   botonMenu.setAttribute("aria-expanded", abierto);
 });
 
-// Al tocar un enlace del menú, se cierra (útil en celulares)
 const enlacesMenu = document.querySelectorAll(".menu__lista a");
+
 enlacesMenu.forEach(function (enlace) {
   enlace.addEventListener("click", function () {
     menu.classList.remove("menu--abierto");
@@ -108,18 +92,13 @@ enlacesMenu.forEach(function (enlace) {
 
 
 /* -----------------------------------------------------
-   3. PROYECTOS: PEDIRLOS AL BACKEND Y CREAR LAS TARJETAS
+  3. PROYECTOS: PEDIRLOS AL BACKEND Y CREAR LAS TARJETAS
    ----------------------------------------------------- */
 
-// Función que recibe un proyecto (objeto) y devuelve la tarjeta HTML ya armada.
-// Uso textContent (y no innerHTML) para que el texto se muestre tal cual
-// y nadie pueda meter código HTML en un proyecto.
 function crearTarjeta(proyecto) {
-  // createElement crea un elemento nuevo
   const tarjeta = document.createElement("article");
   tarjeta.classList.add("proyecto");
 
-  // La imagen es opcional: solo la agrego si el proyecto tiene una
   if (proyecto.imagen) {
     const imagen = document.createElement("img");
     imagen.classList.add("proyecto__imagen");
@@ -142,22 +121,20 @@ function crearTarjeta(proyecto) {
   descripcion.classList.add("proyecto__descripcion");
   descripcion.textContent = proyecto.descripcion;
 
-  // Lista de tecnologías: recorro el arreglo con un bucle for...of
   const tecnologias = document.createElement("ul");
   tecnologias.classList.add("etiquetas", "proyecto__tecnologias");
+
   for (const tecnologia of proyecto.tecnologias) {
     const item = document.createElement("li");
     item.textContent = tecnologia;
     tecnologias.appendChild(item);
   }
 
-  // appendChild mete un elemento dentro de otro
   cuerpo.appendChild(avance);
   cuerpo.appendChild(titulo);
   cuerpo.appendChild(descripcion);
   cuerpo.appendChild(tecnologias);
 
-  // El enlace también es opcional
   if (proyecto.enlace) {
     const enlace = document.createElement("a");
     enlace.classList.add("boton", "boton--principal", "proyecto__enlace");
@@ -173,68 +150,236 @@ function crearTarjeta(proyecto) {
   return tarjeta;
 }
 
-// Función que dibuja en pantalla la lista de proyectos que recibe
+
 function mostrarProyectos(lista) {
-  listaProyectos.innerHTML = ""; // vacío el contenedor antes de volver a dibujar
+  listaProyectos.innerHTML = "";
 
   lista.forEach(function (proyecto) {
     listaProyectos.appendChild(crearTarjeta(proyecto));
   });
 
-  // Si no hay nada para mostrar, aparece un mensaje; si hay, se oculta
   if (lista.length === 0) {
-    // Distingo si no hay proyectos cargados o si la búsqueda no encontró ninguno
     sinResultados.textContent =
       proyectos.length === 0
         ? "Todavía no hay proyectos publicados."
         : "No encontré ningún proyecto con esa búsqueda.";
   }
+
   sinResultados.hidden = lista.length > 0;
 }
 
-// Función ASÍNCRONA: pide los proyectos al servidor.
-// "async/await" permite esperar la respuesta de la red sin trabar la página.
+
 async function cargarProyectos() {
   try {
-    // fetch hace una petición HTTP GET a la API y espera la respuesta
     const respuesta = await fetch(API_PROYECTOS);
 
-    // respuesta.ok es false si el servidor devolvió un error (404, 500, etc.)
     if (!respuesta.ok) {
       throw new Error("El servidor respondió con el código " + respuesta.status);
     }
 
-    // Convierto el JSON de la respuesta en un arreglo de objetos de JavaScript
     proyectos = await respuesta.json();
 
     mensajeCarga.hidden = true;
     mostrarProyectos(proyectos);
+
   } catch (error) {
-    // Si falla (por ejemplo, el backend está apagado), aviso al usuario
     console.error("No se pudieron cargar los proyectos:", error);
+
     mensajeCarga.textContent =
       "No se pudieron cargar los proyectos. Verificá que el servidor esté encendido.";
+
     mensajeCarga.hidden = false;
   }
 }
 
-// Al abrir la página pido los proyectos
 cargarProyectos();
 
 
 /* -----------------------------------------------------
-   4. BUSCADOR DE PROYECTOS
+   3 BIS. HABILIDADES Y FORMACIÓN ACADÉMICA DINÁMICAS
    ----------------------------------------------------- */
 
-// EVENTO INPUT: se ejecuta cada vez que el usuario escribe o borra una letra
+// Muestra un mensaje dentro de un contenedor dinámico.
+function mostrarEstadoDinamico(contenedor, texto) {
+  if (!contenedor) return;
+
+  contenedor.replaceChildren();
+
+  const mensaje = document.createElement("p");
+  mensaje.className = "mensaje-vacio";
+  mensaje.textContent = texto;
+
+  contenedor.appendChild(mensaje);
+}
+
+
+// Convierte una fecha YYYY-MM en MM/YYYY.
+function formatearFecha(fecha) {
+  if (!fecha) return "";
+
+  const partes = String(fecha).split("-");
+
+  return partes.length >= 2
+    ? `${partes[1]}/${partes[0]}`
+    : String(fecha);
+}
+
+
+// Pide las habilidades al backend y las muestra agrupadas por categoría.
+async function cargarHabilidadesPublicas() {
+  if (!contenedorHabilidades) return;
+
+  try {
+    const respuesta = await fetch(API_HABILIDADES);
+
+    if (!respuesta.ok) {
+      throw new Error(`Error HTTP ${respuesta.status}`);
+    }
+
+    const habilidades = await respuesta.json();
+
+    contenedorHabilidades.replaceChildren();
+
+    if (!Array.isArray(habilidades) || habilidades.length === 0) {
+      mostrarEstadoDinamico(
+        contenedorHabilidades,
+        "Todavía no hay habilidades registradas."
+      );
+
+      return;
+    }
+
+    // Agrupo las habilidades según su categoría.
+    const grupos = new Map();
+
+    habilidades.forEach((habilidad) => {
+      const categoria = habilidad.categoria || "Otras habilidades";
+
+      if (!grupos.has(categoria)) {
+        grupos.set(categoria, []);
+      }
+
+      grupos.get(categoria).push(habilidad);
+    });
+
+    // Creo un bloque visual por cada categoría.
+    grupos.forEach((elementos, categoria) => {
+      const grupo = document.createElement("div");
+      grupo.className = "habilidades__grupo";
+
+      const titulo = document.createElement("h4");
+      titulo.textContent = categoria;
+
+      const lista = document.createElement("ul");
+      lista.className = "etiquetas";
+
+      elementos.forEach((habilidad) => {
+        const item = document.createElement("li");
+
+        item.textContent =
+          `${habilidad.nombre}${habilidad.nivel ? ` · ${habilidad.nivel}` : ""}`;
+
+        lista.appendChild(item);
+      });
+
+      grupo.append(titulo, lista);
+      contenedorHabilidades.appendChild(grupo);
+    });
+
+  } catch (error) {
+    console.error("No se pudieron cargar las habilidades:", error);
+
+    mostrarEstadoDinamico(
+      contenedorHabilidades,
+      "No se pudieron cargar las habilidades. Verificá que el servidor esté encendido."
+    );
+  }
+}
+
+
+// Pide las formaciones académicas al backend y las muestra en pantalla.
+async function cargarFormacionPublica() {
+  if (!contenedorFormacion) return;
+
+  try {
+    const respuesta = await fetch(API_FORMACIONES);
+
+    if (!respuesta.ok) {
+      throw new Error(`Error HTTP ${respuesta.status}`);
+    }
+
+    const formaciones = await respuesta.json();
+
+    contenedorFormacion.replaceChildren();
+
+    if (!Array.isArray(formaciones) || formaciones.length === 0) {
+      mostrarEstadoDinamico(
+        contenedorFormacion,
+        "Todavía no hay formación académica registrada."
+      );
+
+      return;
+    }
+
+    formaciones.forEach((formacion) => {
+      const tarjeta = document.createElement("article");
+      tarjeta.className = "tarjeta";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = formacion.titulo || "Formación académica";
+
+      const institucion = document.createElement("h4");
+      institucion.textContent = formacion.institucion || "";
+
+      const fechas = document.createElement("p");
+
+      const inicio = formatearFecha(formacion.fecha_inicio);
+
+      const fin = formacion.en_curso
+        ? "En curso"
+        : formatearFecha(formacion.fecha_fin);
+
+      fechas.textContent = [inicio, fin].filter(Boolean).join(" – ");
+
+      tarjeta.append(titulo, institucion, fechas);
+
+      if (formacion.descripcion) {
+        const descripcion = document.createElement("p");
+        descripcion.textContent = formacion.descripcion;
+
+        tarjeta.appendChild(descripcion);
+      }
+
+      contenedorFormacion.appendChild(tarjeta);
+    });
+
+  } catch (error) {
+    console.error("No se pudo cargar la formación académica:", error);
+
+    mostrarEstadoDinamico(
+      contenedorFormacion,
+      "No se pudo cargar la formación académica. Verificá que el servidor esté encendido."
+    );
+  }
+}
+
+
+// Ejecuto las dos funciones cuando se carga el archivo.
+cargarHabilidadesPublicas();
+cargarFormacionPublica();
+
+
+/* -----------------------------------------------------
+  4. BUSCADOR DE PROYECTOS
+   ----------------------------------------------------- */
+
 buscador.addEventListener("input", function () {
-  // trim() saca espacios de los costados; toLowerCase() pasa todo a minúscula
   const texto = buscador.value.trim().toLowerCase();
 
-  // filter se queda solo con los proyectos que cumplen la condición
   const filtrados = proyectos.filter(function (proyecto) {
     const nombre = proyecto.nombre.toLowerCase();
     const tecnologias = proyecto.tecnologias.join(" ").toLowerCase();
+
     return nombre.includes(texto) || tecnologias.includes(texto);
   });
 
@@ -243,18 +388,15 @@ buscador.addEventListener("input", function () {
 
 
 /* -----------------------------------------------------
-   5. FORMULARIO DE CONTACTO
+  5. FORMULARIO DE CONTACTO
    ----------------------------------------------------- */
 
-// Función que muestra (o borra) el error de un campo.
-// "campo" es el input, "mensajeError" es el texto a mostrar ("" = sin error)
 function mostrarError(campo, mensajeError) {
-  const contenedor = campo.parentElement;                            // el <div class="campo">
-  const textoError = document.getElementById("error-" + campo.id);   // el <span> del error
+  const contenedor = campo.parentElement;
+  const textoError = document.getElementById("error-" + campo.id);
 
   textoError.textContent = mensajeError;
 
-  // Cambio las clases para pintar el borde de rojo o de verde
   if (mensajeError === "") {
     contenedor.classList.remove("campo--error");
     contenedor.classList.add("campo--ok");
@@ -264,7 +406,7 @@ function mostrarError(campo, mensajeError) {
   }
 }
 
-// Función de validación del nombre: devuelve true si está bien y false si está mal
+
 function validarNombre() {
   const nombre = campoNombre.value.trim();
 
@@ -272,6 +414,7 @@ function validarNombre() {
     mostrarError(campoNombre, "Escribí tu nombre.");
     return false;
   }
+
   if (nombre.length < 2) {
     mostrarError(campoNombre, "El nombre debe tener al menos 2 letras.");
     return false;
@@ -281,7 +424,7 @@ function validarNombre() {
   return true;
 }
 
-// Función de validación del email, usando una expresión regular simple
+
 function validarEmail() {
   const email = campoEmail.value.trim();
   const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -290,8 +433,13 @@ function validarEmail() {
     mostrarError(campoEmail, "Escribí tu email.");
     return false;
   }
+
   if (!formatoEmail.test(email)) {
-    mostrarError(campoEmail, "El email no tiene un formato válido (ej: nombre@correo.com).");
+    mostrarError(
+      campoEmail,
+      "El email no tiene un formato válido (ej: nombre@correo.com)."
+    );
+
     return false;
   }
 
@@ -299,7 +447,7 @@ function validarEmail() {
   return true;
 }
 
-// Función de validación del mensaje
+
 function validarMensaje() {
   const mensaje = campoMensaje.value.trim();
 
@@ -307,6 +455,7 @@ function validarMensaje() {
     mostrarError(campoMensaje, "Escribí un mensaje.");
     return false;
   }
+
   if (mensaje.length < 10) {
     mostrarError(campoMensaje, "El mensaje debe tener al menos 10 caracteres.");
     return false;
@@ -316,12 +465,13 @@ function validarMensaje() {
   return true;
 }
 
-// EVENTO INPUT en el mensaje: actualiza el contador de caracteres mientras se escribe
+
+// Actualizo el contador de caracteres mientras se escribe.
 campoMensaje.addEventListener("input", function () {
   const cantidad = campoMensaje.value.length;
+
   contadorMensaje.textContent = cantidad + " / " + MAX_MENSAJE;
 
-  // Si se pasa del máximo, el contador se pone rojo
   if (cantidad > MAX_MENSAJE) {
     contadorMensaje.style.color = "#ff6b6b";
   } else {
@@ -329,36 +479,37 @@ campoMensaje.addEventListener("input", function () {
   }
 });
 
-// Valido cada campo cuando el usuario sale de él (evento blur)
+
 campoNombre.addEventListener("blur", validarNombre);
 campoEmail.addEventListener("blur", validarEmail);
 campoMensaje.addEventListener("blur", validarMensaje);
 
-// EVENTO SUBMIT: se ejecuta al apretar "Enviar mensaje"
+
+// Valido el formulario al enviarlo.
 formulario.addEventListener("submit", function (evento) {
-  // preventDefault evita que el navegador recargue la página
   evento.preventDefault();
 
-  // Ejecuto las tres validaciones (las guardo en variables para que se muestren todos los errores a la vez)
   const nombreOk = validarNombre();
   const emailOk = validarEmail();
   const mensajeOk = validarMensaje();
 
-  // Si todo está bien, muestro la confirmación y limpio el formulario
   if (nombreOk && emailOk && mensajeOk) {
     const nombre = campoNombre.value.trim();
 
-    respuestaFormulario.textContent = "¡Gracias, " + nombre + "! Tu mensaje fue validado correctamente.";
+    respuestaFormulario.textContent =
+      "¡Gracias, " + nombre + "! Tu mensaje fue validado correctamente.";
+
     respuestaFormulario.classList.add("respuesta--ok");
     respuestaFormulario.hidden = false;
 
     formulario.reset();
+
     contadorMensaje.textContent = "0 / " + MAX_MENSAJE;
 
-    // Saco los bordes verdes de los campos
     document.querySelectorAll(".campo").forEach(function (campo) {
       campo.classList.remove("campo--ok", "campo--error");
     });
+
   } else {
     respuestaFormulario.hidden = true;
   }
@@ -369,5 +520,4 @@ formulario.addEventListener("submit", function (evento) {
    6. AÑO ACTUAL EN EL PIE DE PÁGINA
    ----------------------------------------------------- */
 
-// Date es un objeto que representa la fecha actual
 document.getElementById("anio").textContent = new Date().getFullYear();
